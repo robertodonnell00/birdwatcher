@@ -54,8 +54,15 @@ This project is an Internet of Things (IoT) system designed to detect motion usi
 ## Notes
 
 - For best performance, test in a well-lit environment.  
-- Camera angle and PIR sensor range may need manual adjustment.  
+- Camera angle and PIR sensor range may need manual adjustment.
+- When the app is run, it will initially detect motion even if nothing is moving.
 - Ensure cloud billing caps are in place to avoid unexpected charges.
+
+## Future 
+If I were to develop this app further, here are things I would add:
+- More specific AI, detects bird species, gender, etc.
+- Add weather sensors, this will help determine which weather conditions the birds favour.
+- Add location, this would help if multiple devices were added
 
 ## Code Breakdown
 ![Sample_Output](bird_images/code-azure.jpg)
