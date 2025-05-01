@@ -154,6 +154,7 @@ If the tag "bird" is found, the image is uploaded.
 Otherwise, it prints: "No bird detected, not uploading."
 
 ![Sample_Output](bird_images/main-loop-cont.jpg)
+
 **Create metadata dictionary**
 
     metadata = {
