@@ -5,3 +5,4 @@ azure-storage-blob # If you're using Azure Blob Storage
 boto3              # If you're using AWS (S3 or Rekognition)
 python-dotenv      # To manage environment variables (.env file for API keys)
 azure-iot-device   # To send Metadata to hub
+msrest             # A dependency of Azure SDKs
