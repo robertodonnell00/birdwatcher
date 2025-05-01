@@ -55,7 +55,7 @@ This project is an Internet of Things (IoT) system designed to detect motion usi
 
 - For best performance, test in a well-lit environment.  
 - Camera angle and PIR sensor range may need manual adjustment.
-- When the app is run, it will initially detect motion even if nothing is moving.
+- When the app is first run, it will initially detect motion even if nothing is moving.
 - Ensure cloud billing caps are in place to avoid unexpected charges.
 
 ## Future 
