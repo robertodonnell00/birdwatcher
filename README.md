@@ -64,7 +64,8 @@ This project is an Internet of Things (IoT) system designed to detect motion usi
 - Azure Blob Storage Setup. Loads your Azure Blob Storage connection string. Defines which container to use.
 
 ![Sample_Output](bird_images/upload-image.jpg)
-    lob_name = os.path.basename(image_filename)
+    
+    blob_name = os.path.basename(image_filename)
 
 Extracts just the filename from a full path.
 E.g., from "images/bird1.jpg" → "bird1.jpg"
