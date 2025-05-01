@@ -203,7 +203,7 @@ Confirms the area is clear and it's ready for the next trigger.
 
 **Sleep briefly if no motion detected**
 
-else:
-    time.sleep(0.1)
+    else:
+        time.sleep(0.1)
 
 If the PIR didn’t trigger, the script sleeps briefly (100ms) to reduce CPU usage before checking again.
