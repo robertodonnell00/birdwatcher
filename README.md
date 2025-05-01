@@ -91,6 +91,7 @@ Uploads the binary image data to Azure Blob Storage.
 
 - content_settings: tells Azure this is a JPEG image (helps with previewing in browsers and tools).
 
+
     print(f"Image '{blob_name}' uploaded successfully to '{container_name}'.")
 
 Prints a confirmation message to the console.
