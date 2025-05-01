@@ -37,7 +37,7 @@ This project is an Internet of Things (IoT) system designed to detect motion usi
     ```
 
 4. Configure cloud credentials and endpoints eg. connections strings, device ID. etc. 
-5. Run the main detection script:
+5. Run the main script, app.py:
 
     ```bash
     python app.py
