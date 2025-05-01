@@ -64,148 +64,144 @@ This project is an Internet of Things (IoT) system designed to detect motion usi
 - Azure Blob Storage Setup. Loads your Azure Blob Storage connection string. Defines which container to use.
 
 ![Sample_Output](bird_images/upload-image.jpg)
-lob_name = os.path.basename(image_filename)
+    lob_name = os.path.basename(image_filename)
 
-    Extracts just the filename from a full path.
-    E.g., from "images/bird1.jpg" → "bird1.jpg"
-    This will be the name used in the blob container.
+Extracts just the filename from a full path.
+E.g., from "images/bird1.jpg" → "bird1.jpg"
+This will be the name used in the blob container.
 
-with open(image_filename, "rb") as data:
+    with open(image_filename, "rb") as data:
 
-    Opens the image file in binary read mode ("rb") so it can be uploaded.
+Opens the image file in binary read mode ("rb") so it can be uploaded.
 
-blob_client = container_client.get_blob_client(blob_name)
+    blob_client = container_client.get_blob_client(blob_name)
 
-    Gets a reference to the blob (like a "file handle" in the cloud) inside the container for this image.
+Gets a reference to the blob (like a "file handle" in the cloud) inside the container for this image.
 
-blob_client.upload_blob(
-    data,
-    overwrite=True,
-    content_settings=ContentSettings(content_type="image/jpeg")
-)
+    blob_client.upload_blob(
+        data,
+        overwrite=True,
+        content_settings=ContentSettings(content_type="image/jpeg")
+    )
 
-    Uploads the binary image data to Azure Blob Storage.
+Uploads the binary image data to Azure Blob Storage.
 
-    overwrite=True: replaces the blob if one with the same name already exists.
+- overwrite=True: replaces the blob if one with the same name already exists.
 
-    content_settings: tells Azure this is a JPEG image (helps with previewing in browsers and tools).
+- content_settings: tells Azure this is a JPEG image (helps with previewing in browsers and tools).
 
-print(f"Image '{blob_name}' uploaded successfully to '{container_name}'.")
+    print(f"Image '{blob_name}' uploaded successfully to '{container_name}'.")
 
-    Prints a confirmation message to the console.
+Prints a confirmation message to the console.
 
 ![Sample_Output](bird_images/main-loop.jpg)
-print("Motion sensor armed... Waiting for motion...")
+    
+    print("Motion sensor armed... Waiting for motion...")
 
-    A startup message confirming the system is ready.
+A startup message confirming the system is ready.
 
-Infinite Loop with Motion Detection:
+**Infinite Loop with Motion Detection:**
 
-while True:
-    if GPIO.input(PIR_PIN):
+    while True:
+        if GPIO.input(PIR_PIN):
 
-    Checks for motion using the PIR sensor (PIR_PIN).
+Checks for motion using the PIR sensor (PIR_PIN).
+If triggered, the block below runs.
 
-    If triggered, the block below runs.
+**Capture the image:**
 
-Capture the image:
+    timestamp = datetime.datetime.now().strftime(...)
+    image_path = f"{IMAGE_FOLDER}/bird_{timestamp}.jpg"
+    camera.capture(image_path)
 
-timestamp = datetime.datetime.now().strftime(...)
-image_path = f"{IMAGE_FOLDER}/bird_{timestamp}.jpg"
-camera.capture(image_path)
+Generates a timestamped filename.
 
-    Generates a timestamped filename.
+Captures a photo and saves it locally.
 
-    Captures a photo and saves it locally.
+**Run prediction with Custom Vision:**
 
-Run prediction with Custom Vision:
+    with open(image_path, "rb") as image_file:
+        results = predictor.classify_image(...)
 
-with open(image_path, "rb") as image_file:
-    results = predictor.classify_image(...)
+Opens the image file in binary mode.
 
-    Opens the image file in binary mode.
+Sends it to the AI model for classification.
 
-    Sends it to the AI model for classification.
+**Process predictions:**
 
-Process predictions:
+    predictions = {
+        pred.tag_name: round(pred.probability * 100, 2)
+        for pred in results.predictions
+        if pred.probability > 0.5
+    }
 
-predictions = {
-    pred.tag_name: round(pred.probability * 100, 2)
-    for pred in results.predictions
-    if pred.probability > 0.5
-}
+Builds a dictionary of tags with probability > 50%.
 
-    Builds a dictionary of tags with probability > 50%.
+**Print results:**
 
-Print results:
+    for tag, prob in predictions.items():
+        print(f"{tag}: {prob}%")
+    
+Outputs prediction results to the console.
 
-for tag, prob in predictions.items():
-    print(f"{tag}: {prob}%")
+**Check for bird detection:**
 
-    Outputs prediction results to the console.
+    if any(tag == "bird" for tag in predictions):
+        upload_bird_image(image_path)
 
-Check for bird detection:
+If the tag "bird" is found, the image is uploaded.
 
-if any(tag == "bird" for tag in predictions):
-    upload_bird_image(image_path)
-
-    If the tag "bird" is found, the image is uploaded.
-
-    Otherwise, it prints: "No bird detected, not uploading."
+Otherwise, it prints: "No bird detected, not uploading."
 
 ![Sample_Output](bird_images/main-loop-cont.jpg)
-Create metadata dictionary
+**Create metadata dictionary**
 
-metadata = {
-    "device_id": "feeder-pi",
-    "timestamp": timestamp,
-    "motion": True,
-    "image_path": image_path,
-    "predictions": predictions
-}
+    metadata = {
+        "device_id": "feeder-pi",
+        "timestamp": timestamp,
+        "motion": True,
+        "image_path": image_path,
+        "predictions": predictions
+    }
 
-    Bundles relevant info into a dictionary:
+Bundles relevant info into a dictionary:
 
-        Device name
+- Device name
+- Time of detection
+- Motion flag
+- Saved image path
+- AI prediction results
 
-        Time of detection
+**Send data to Azure IoT Hub**
 
-        Motion flag
+    msg = Message(json.dumps(metadata))
+    device_client.send_message(msg)
 
-        Saved image path
+Converts metadata to a JSON-formatted message.
 
-        AI prediction results
+Sends it to Azure IoT Hub so it can be logged, displayed, or trigger further actions.
 
-2. Send data to Azure IoT Hub
+    print("Metadata message sent to Azure IoT Hub.")
 
-msg = Message(json.dumps(metadata))
-device_client.send_message(msg)
+Confirms the message was sent.
 
-    Converts metadata to a JSON-formatted message.
+**Wait for motion to stop before continuing**
 
-    Sends it to Azure IoT Hub so it can be logged, displayed, or trigger further actions.
+    print("Waiting for motion to stop...")
+    while GPIO.input(PIR_PIN):
+        time.sleep(0.1)
 
-print("Metadata message sent to Azure IoT Hub.")
+Holds the loop until the PIR sensor no longer detects movement.
 
-    Confirms the message was sent.
+Prevents re-triggering the process immediately.
 
-3. Wait for motion to stop before continuing
+    print("No motion.")
 
-print("Waiting for motion to stop...")
-while GPIO.input(PIR_PIN):
-    time.sleep(0.1)
+Confirms the area is clear and it's ready for the next trigger.
 
-    Holds the loop until the PIR sensor no longer detects movement.
-
-    Prevents re-triggering the process immediately.
-
-print("No motion.")
-
-    Confirms the area is clear and it's ready for the next trigger.
-
-4. Sleep briefly if no motion detected
+**Sleep briefly if no motion detected**
 
 else:
     time.sleep(0.1)
 
-    If the PIR didn’t trigger, the script sleeps briefly (100ms) to reduce CPU usage before checking again.
+If the PIR didn’t trigger, the script sleeps briefly (100ms) to reduce CPU usage before checking again.
