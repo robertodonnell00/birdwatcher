@@ -4,6 +4,8 @@
 
 This project is an Internet of Things (IoT) system designed to detect motion using a Raspberry Pi and PIR sensor, capture images, and analyze them using a cloud-based Custom Vision AI model. The system detects motion, takes a picture, scans the picture with Custom Vision AI, if a bird is detected the image will be uploaded to Blob Storage (otherwise stored locally), metadata is sent to Azure.
 
+https://youtu.be/IN9IVbtaEPA
+
 ## Features
 
 - Motion detection via PIR sensor on Raspberry Pi  
